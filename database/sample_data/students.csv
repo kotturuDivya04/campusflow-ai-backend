@@ -1,0 +1,6 @@
+username,email,first_name,last_name,phone,roll_number,department_code,section_name,admission_year,current_semester
+ajones,alice.jones@campusflow.edu,Alice,Jones,+15550201,2026_CS_001,CS,CS-A,2026,1
+bsmith,bob.smith@campusflow.edu,Bob,Smith,+15550202,2026_CS_002,CS,CS-A,2026,1
+cwhite,charlie.white@campusflow.edu,Charlie,White,+15550203,2026_CS_015,CS,CS-B,2026,1
+djohnson,david.johnson@campusflow.edu,David,Johnson,+15550204,2026_EE_001,EE,EE-A,2026,1
+emiller,emma.miller@campusflow.edu,Emma,Miller,+15550205,2026_ME_001,ME,ME-A,2026,1

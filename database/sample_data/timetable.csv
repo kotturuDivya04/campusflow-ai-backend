@@ -1,0 +1,7 @@
+section_name,subject_code,faculty_code,classroom_number,slot_name,day_of_week,academic_year,semester
+CS-A,CS-101,FAC_CS_01,LH-101,Period 1,Monday,2026,Fall
+CS-A,CS-101,FAC_CS_01,LH-101,Period 2,Monday,2026,Fall
+CS-A,CS-202,FAC_CS_02,LH-102,Period 3,Monday,2026,Fall
+CS-B,CS-202,FAC_CS_02,CS-LAB-1,Period 4,Monday,2026,Fall
+EE-A,EE-101,FAC_EE_01,SEM-301,Period 1,Tuesday,2026,Fall
+ME-A,ME-101,FAC_ME_01,LH-102,Period 2,Tuesday,2026,Fall

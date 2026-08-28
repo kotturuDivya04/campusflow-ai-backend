@@ -1,0 +1,96 @@
+version: "3.9"
+
+services:
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+
+    container_name: campusflow-db
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: campusflow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d campusflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - campusflow-network
+
+  parser:
+    build:
+      context: ./parser
+      dockerfile: Dockerfile
+
+    container_name: campusflow-parser
+
+    restart: unless-stopped
+
+    depends_on:
+      database:
+        condition: service_healthy
+
+    environment:
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: campusflow
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+
+    volumes:
+      - ./parser/uploads:/app/uploads
+
+    networks:
+      - campusflow-network
+
+  backend:
+    build:
+      context: ./campusflow_backend
+      dockerfile: Dockerfile
+
+    container_name: campusflow-backend
+
+    restart: unless-stopped
+
+    depends_on:
+      database:
+        condition: service_healthy
+
+    environment:
+      CAMPUSFLOW_DATABASE_URL: postgresql+psycopg2://postgres:postgres@database:5432/campusflow
+      CAMPUSFLOW_JWT_SECRET: change-me-in-production
+      CAMPUSFLOW_ENV: development
+
+    ports:
+      - "8000:8000"
+
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+    volumes:
+      - ./campusflow_backend/app:/app/app
+      - ./campusflow_backend/migrations:/app/migrations
+      - ./campusflow_backend/alembic:/app/alembic
+      - ./campusflow_backend/alembic.ini:/app/alembic.ini
+
+    networks:
+      - campusflow-network
+
+volumes:
+  postgres_data:
+
+networks:
+  campusflow-network:
+    driver: bridge

@@ -1,0 +1,5 @@
+username,email,first_name,last_name,phone,faculty_code,department_code,designation,office_location
+aturing,alan.turing@campusflow.edu,Alan,Turing,+15550101,FAC_CS_01,CS,Professor & Head,"Turing Block, Room 402"
+ghopper,grace.hopper@campusflow.edu,Grace,Hopper,+15550102,FAC_CS_02,CS,Associate Professor,"Hopper Lab, Room 204"
+ntesla,nikola.tesla@campusflow.edu,Nikola,Tesla,+15550103,FAC_EE_01,EE,Professor & Head,"Tesla Labs, Room 101"
+jwatt,james.watt@campusflow.edu,James,Watt,+15550104,FAC_ME_01,ME,Assistant Professor,"Watt Workshop, Room 12"

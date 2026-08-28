@@ -1,0 +1,5 @@
+student_roll,faculty_code,request_type,title,description,status,scheduled_time
+2026_CS_001,FAC_CS_01,Appointment,Discuss Term Project Idea,Requesting a 15-minute slot to finalize my project topic on Turing Machines.,Approved,2026-07-20 14:00:00+00
+2026_CS_002,FAC_CS_01,Recommendation Letter,Recommendation Letter for Internship,Need a reference letter for a research position at Bell Labs.,Pending,
+2026_CS_015,FAC_CS_02,Grade Query,Midterm Grade Discrepancy,I noticed a calculation error in my Question 3 grading.,Pending,
+2026_CS_001,FAC_CS_02,Appointment,Final Exam Prep advice,Need guidance on key focus areas for Data Structures exam.,Rejected,

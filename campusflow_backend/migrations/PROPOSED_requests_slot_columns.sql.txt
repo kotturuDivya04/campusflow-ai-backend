@@ -1,0 +1,54 @@
+-- ============================================================================
+-- PROPOSED — REQUIRES TEAM APPROVAL. NOT APPLIED AUTOMATICALLY.
+--
+-- This file is intentionally NOT listed in app/db/init_db.py's migration ORDER
+-- and is NOT an Alembic revision. It documents the SMALLEST safe change that
+-- removes the one fragile workaround in the backend, for the team to review and
+-- approve before it is ever run.
+-- ============================================================================
+--
+-- PROBLEM
+--   The canonical `requests` table has no column for the requested academic
+--   slot or meeting date — only `scheduled_time TIMESTAMPTZ`. The MVP therefore
+--   encodes the requested (date, slot) as
+--       scheduled_time = combine(date, slot.start_time)
+--   and recovers the slot by matching that time back to academic_slots.start_time.
+--   This works ONLY because seeded slot start times are unique; it is fragile if
+--   two slots ever share a start time, and it cannot represent a request for a
+--   slot without also pinning an exact timestamp.
+--
+-- SMALLEST SAFE ALTERNATIVE (purely additive, backward compatible)
+--   Add two NULLABLE columns to `requests`. Existing rows and existing inserts
+--   keep working unchanged; the application simply populates and reads these
+--   columns instead of decoding the timestamp. No column is dropped or retyped,
+--   no constraint is tightened, so this cannot break current data or clients.
+--
+--   ALTER TABLE requests
+--     ADD COLUMN IF NOT EXISTS academic_slot_id BIGINT
+--       REFERENCES academic_slots(id) ON DELETE RESTRICT,
+--     ADD COLUMN IF NOT EXISTS meeting_date DATE;
+--
+--   -- Optional one-time backfill for rows created by the timestamp-encoding MVP
+--   -- (safe to run repeatedly; only fills NULLs):
+--   UPDATE requests r
+--      SET meeting_date = (r.scheduled_time AT TIME ZONE 'UTC')::date,
+--          academic_slot_id = s.id
+--     FROM academic_slots s
+--    WHERE r.academic_slot_id IS NULL
+--      AND r.scheduled_time IS NOT NULL
+--      AND s.start_time = (r.scheduled_time AT TIME ZONE 'UTC')::time;
+--
+-- APPLICATION CHANGE REQUIRED IF APPROVED (small, localized)
+--   * app/models/models.py            add the two mapped columns to Request
+--   * app/services/appointment_service.submit / _resolve_dated_slot
+--                                      write & read the columns directly;
+--                                      delete the start-time matching helper
+--   Nothing else depends on the encoding, so the blast radius is one service
+--   plus one model.
+--
+-- WHY NOT DONE AUTOMATICALLY
+--   It alters a canonical table. Per the brief and the team's ownership of the
+--   finalized schema, canonical changes are proposed for review, never applied
+--   silently. Until approved, the timestamp-encoding path remains in place and
+--   is covered by the integration checks.
+-- ============================================================================

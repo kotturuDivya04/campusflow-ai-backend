@@ -1,0 +1,65 @@
+<mxfile host="65bd71144e">
+    <diagram id="R2l51a_O9R7V6H1q1B3p" name="CampusFlow AI ERD">
+        <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <!-- Entity: users -->
+                <mxCell id="users" value="users&#10;+ id (PK)&#10;username (UQ)&#10;email (UQ)&#10;password_hash&#10;first_name&#10;last_name&#10;phone&#10;status" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="40" width="160" height="190" as="geometry"/>
+                </mxCell>
+                <!-- Entity: roles -->
+                <mxCell id="roles" value="roles&#10;+ id (PK)&#10;name (UQ)&#10;description" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="280" y="40" width="140" height="100" as="geometry"/>
+                </mxCell>
+                <!-- Entity: user_roles -->
+                <mxCell id="user_roles" value="user_roles&#10;* user_id (FK)&#10;* role_id (FK)" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="280" y="190" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <!-- Entity: departments -->
+                <mxCell id="departments" value="departments&#10;+ id (PK)&#10;code (UQ)&#10;name&#10;description&#10;head_faculty_id (FK)" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="320" width="170" height="130" as="geometry"/>
+                </mxCell>
+                <!-- Entity: faculty -->
+                <mxCell id="faculty" value="faculty&#10;+ id (PK, FK)&#10;faculty_code (UQ)&#10;department_id (FK)&#10;designation&#10;office_location" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="280" y="320" width="170" height="130" as="geometry"/>
+                </mxCell>
+                <!-- Entity: students -->
+                <mxCell id="students" value="students&#10;+ id (PK, FK)&#10;roll_number (UQ)&#10;department_id (FK)&#10;section_id (FK)&#10;admission_year&#10;current_semester" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="540" width="170" height="160" as="geometry"/>
+                </mxCell>
+                <!-- Entity: sections -->
+                <mxCell id="sections" value="sections&#10;+ id (PK)&#10;name&#10;department_id (FK)&#10;academic_year&#10;semester" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="280" y="540" width="160" height="140" as="geometry"/>
+                </mxCell>
+                <!-- Entity: subjects -->
+                <mxCell id="subjects" value="subjects&#10;+ id (PK)&#10;code (UQ)&#10;name&#10;description&#10;credits&#10;department_id (FK)" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="500" y="320" width="160" height="150" as="geometry"/>
+                </mxCell>
+                <!-- Entity: timetable -->
+                <mxCell id="timetable" value="timetable&#10;+ id (PK)&#10;section_id (FK)&#10;subject_id (FK)&#10;faculty_id (FK)&#10;classroom_id (FK)&#10;academic_slot_id (FK)&#10;day_of_week&#10;academic_year&#10;semester" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="500" y="540" width="180" height="200" as="geometry"/>
+                </mxCell>
+                <!-- Entity: requests -->
+                <mxCell id="requests" value="requests&#10;+ id (PK)&#10;student_id (FK)&#10;faculty_id (FK)&#10;request_type&#10;title&#10;description&#10;status&#10;scheduled_time" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeWidth=1;" vertex="1" parent="1">
+                    <mxGeometry x="720" y="320" width="160" height="180" as="geometry"/>
+                </mxCell>
+                <!-- Connections -->
+                <mxCell id="edge1" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;endArrow=none;endFill=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="users" target="user_roles">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge2" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;endFill=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="roles" target="user_roles">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge3" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=none;endFill=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="users" target="departments">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="120" y="240" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge4" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;endArrow=none;endFill=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="departments" target="faculty">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
