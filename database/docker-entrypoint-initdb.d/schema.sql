@@ -673,6 +673,7 @@ CREATE TABLE placement_announcements (
         REFERENCES departments(id) ON DELETE SET NULL,
 
     section VARCHAR(50),
+    opportunity_type VARCHAR(50),
 
     target_student_ids JSONB,
 

@@ -342,6 +342,7 @@ class PlacementAnnouncement(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     company: Mapped[str] = mapped_column(String(150), nullable=False)
+    opportunity_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=False)
 
     drive_date: Mapped[_dt.date | None] = mapped_column(Date)

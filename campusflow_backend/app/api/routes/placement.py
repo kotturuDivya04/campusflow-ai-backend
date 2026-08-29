@@ -16,6 +16,14 @@ class TargetType(str, Enum):
     DEPARTMENT = "DEPARTMENT"
     SECTION = "SECTION"
     SELECTED = "SELECTED"
+    
+class OpportunityType(str, Enum):
+    PLACEMENT_DRIVE = "Placement Drive"
+    INTERNSHIP = "Internship"
+    PRE_PLACEMENT_TALK = "Pre-Placement Talk"
+    FULL_TIME_OPPORTUNITY = "Full-Time Opportunity"
+    CAREER_WORKSHOP = "Career Workshop"
+    GENERAL_ANNOUNCEMENT = "General Announcement"
 
 class AnnouncementStatus(str, Enum):
     ACTIVE = "ACTIVE"
@@ -24,6 +32,7 @@ class AnnouncementStatus(str, Enum):
 class AnnouncementCreate(BaseModel):
     title: str
     company: str
+    opportunity_type: OpportunityType
     description: str
     drive_date: Optional[date] = None
     registration_deadline: Optional[datetime] = None
