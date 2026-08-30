@@ -43,7 +43,7 @@ from app.repositories.repositories import (
 from app.services import priority, transitions
 
 from app.ai.priority_engine import AIPriorityEngine
-from app.models.models import QueueEntry, SwapRequest
+from app.models.models import QueueEntry
 from app.ai.models import PriorityDecision
 from app.services import queue_logic as _queue_logic
 
@@ -241,75 +241,65 @@ class AppointmentService:
         # api/routes/student.py rather than adding a parallel mechanism.
         # This NEVER reorders the queue by itself - only an explicit accept
         # (by the targeted student, via POST /student/swaps/{id}/accept)
-        # moves anyone.
+        # HIGH-priority AI notification
+            
         if calc_priority_score >= 70:
             try:
                 self._notify.notify(
-                    user_id=req.faculty_id, event_key="AI_PRIORITY_FLAGGED",
-                    message=(f"AI Priority Engine flagged '{req.title}' as HIGH priority "
-                             f"(score {calc_priority_score}). Reason: {decision_reason}"),
+                    user_id=req.faculty_id,
+                    event_key="AI_PRIORITY_FLAGGED",
+                    message=(
+                        f"AI Priority Engine flagged '{req.title}' as HIGH priority "
+                        f"(score {calc_priority_score}). Reason: {decision_reason}"
+                    ),
                 )
+
                 self._notify.notify(
-                    user_id=req.student_id, event_key="AI_PRIORITY_FLAGGED",
-                    message=(f"Your request '{req.title}' was flagged HIGH priority "
-                             f"(score {calc_priority_score}) by the AI Priority Engine."),
+                    user_id=req.student_id,
+                    event_key="AI_PRIORITY_FLAGGED",
+                    message=(
+                        f"Your request '{req.title}' was flagged HIGH priority "
+                        f"(score {calc_priority_score}) by the AI Priority Engine."
+                    ),
                 )
-                same_session = self._queue.session_entries(req.faculty_id, date)
-                pending_target_ids = {
-                    row[0] for row in self._requests.db.execute(
-                        select(SwapRequest.target_queue_entry_id).where(
-                            SwapRequest.status == "PENDING")
-                    ).all()
-                }
-                candidates = [
-                    e for e in same_session
-                    if e.id != entry.id and e.state == QueueState.WAITING.value
-                    and _queue_logic.is_ahead_in_session(
-                        e.slot.start_time, e.token_number,
-                        slot.start_time, token_number)
-                ]
-                candidates = _queue_logic.exclude_pending_targets(candidates, pending_target_ids)
-                target = _queue_logic.select_next_swap_candidate(
-                    candidates, requester_priority_score=calc_priority_score,
-                    already_asked_ids=set(),
-                )
-                if target is not None:
-                    swap = SwapRequest(
-                        requesting_queue_entry_id=entry.id,
-                        target_queue_entry_id=target.id,
-                        reason=f"AI Priority Engine: {decision_reason}",
-                        status="PENDING",
-                    )
-                    self._requests.db.add(swap)
-                    self._requests.db.flush()
-                    self._notify.notify(
-                        user_id=target.student_id, event_key="SWAP_REQUESTED",
-                        message=(f"Another student's request was flagged urgent by the AI "
-                                 f"Priority Engine and would like your earlier slot (token "
-                                 f"#{target.token_number}). You may ACCEPT or DECLINE via "
-                                 f"POST /student/swaps/{{id}}/accept|decline - swap #{swap.id}."),
-                    )
+
             except Exception:
                 import logging
-                logging.exception("Auto swap-proposal on HIGH priority approval failed for request_id=%s", req.id)
+
+                logging.exception(
+                    "AI priority notification failed for request_id=%s",
+                    req.id,
+                )
 
         return req, entry
 
     # -- 8) reject ----------------------------------------------------------
     def reject(self, *, request_id: int, acting_faculty_id: int, reason: str):
         req = self._requests.by_id(request_id)
+
         if req is None:
             raise NotFound(f"request {request_id} not found")
+
         if req.faculty_id != acting_faculty_id:
             raise PermissionDenied("not your request to reject")
-        transitions.check_request(RequestStatus(req.status), RequestStatus.REJECTED)
-        self._requests.update_status(req, RequestStatus.REJECTED.value)
+
+        transitions.check_request(
+            RequestStatus(req.status),
+            RequestStatus.REJECTED
+        )
+
+        self._requests.update_status(
+            req,
+            RequestStatus.REJECTED.value
+        )
+
         self._notify.notify(
-            user_id=req.student_id, event_key="REQUEST_REJECTED",
+            user_id=req.student_id,
+            event_key="REQUEST_REJECTED",
             message=f"Your request '{req.title}' was rejected. Reason: {reason}",
         )
-        return req
 
+        return req
     # -- 9) reschedule ------------------------------------------------------
     def reschedule(self, *, request_id: int, acting_faculty_id: int,
                    date: _dt.date, slot_id: int, note: str | None = None):
