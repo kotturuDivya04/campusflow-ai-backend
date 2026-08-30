@@ -1,19 +1,18 @@
 """
 FastAPI application entrypoint.
-
-  * mounts the four routers (auth, faculty, student, admin)
-  * translates every CampusFlowError into its documented HTTP status
-  * exposes /health and auto-generated OpenAPI docs at /docs
 """
 from __future__ import annotations
-from app.modules.clubs import router as clubs
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.modules.clubs import router as clubs
 from app.api.routes import admin, auth, faculty, student, placement
+from app.ai.router import router as ai_router
 from app.core.config import settings
 from app.core.errors import CampusFlowError
+
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -23,6 +22,7 @@ app = FastAPI(
         "token queue, built directly on the finalized PostgreSQL schema."
     ),
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,12 +43,22 @@ async def campusflow_error_handler(_: Request, exc: CampusFlowError):
 
 @app.get("/health", tags=["meta"])
 def health():
-    return {"status": "ok", "app": settings.APP_NAME, "version": settings.APP_VERSION}
+    return {
+        "status": "ok",
+        "app": settings.APP_NAME,
+        "version": settings.APP_VERSION
+    }
 
 
+# Existing routers
 app.include_router(auth.router)
 app.include_router(faculty.router)
 app.include_router(student.router)
 app.include_router(admin.router)
 app.include_router(clubs)
+
+# KEEP PLACEMENT
 app.include_router(placement.router)
+
+# ADD AI
+app.include_router(ai_router)

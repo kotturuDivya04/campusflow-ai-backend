@@ -103,6 +103,56 @@ def compute_free_slots(
     return kept
 
 
+def slot_capacity(slot: SlotView, meeting_minutes: int) -> int:
+    """
+    How many fixed-duration appointment slots a PERIOD (academic_slots row)
+    actually holds. A period is NOT a single indivisible occupied unit.
+    """
+    duration = max(1, slot.end_min() - slot.start_min())
+    return max(1, duration // max(1, meeting_minutes))
+
+
+def full_slots_from_counts(
+    *,
+    academic_slots,
+    approved_counts: dict,
+    meeting_minutes: int,
+) -> set:
+    """
+    Given a per-slot count of active approved appointments, return the ids of
+    slots that are GENUINELY full (count >= real sub-slot capacity) rather
+    than merely "has at least one approved appointment". Pure.
+    """
+    full = set()
+    for s in academic_slots:
+        count = approved_counts.get(s.id, 0)
+        if count <= 0:
+            continue
+        if count >= slot_capacity(s, meeting_minutes):
+            full.add(s.id)
+    return full
+
+
+def first_valid_replacement(
+    *,
+    free_slots,
+    not_before_min: int = 0,
+    exclude_slot_id=None,
+):
+    """
+    Pure cascade-selection step for Faculty BUSY rescheduling: given a day's
+    already-computed free slots (chronological, capacity-aware), return the
+    first one that starts at or after not_before_min and is not the slot
+    being vacated. Returns None if nothing on that day qualifies.
+    """
+    for s in free_slots:
+        if exclude_slot_id is not None and s.id == exclude_slot_id:
+            continue
+        if s.start_min() >= not_before_min:
+            return s
+    return None
+
+
 def explain_unavailable(
     *,
     slot: SlotView,

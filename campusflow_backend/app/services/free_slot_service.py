@@ -62,8 +62,20 @@ class FreeSlotService:
 
         academic_slots = self._slots.as_views()
         teaching = self._timetable.teaching_slot_ids(faculty_id, day, year, semester)
-        approved = self._requests.approved_slot_ids_on_date(faculty_id, date)
         busy = self._busy.busy_slot_ids(faculty_id, date)
+
+        # PERIOD != APPOINTMENT: only mark a period fully occupied once its
+        # approved count reaches real sub-slot capacity (root-cause fix for
+        # the false-409 bug where a second student's request in an
+        # already-occupied period was wrongly rejected).
+        from app.services.free_slot_engine import full_slots_from_counts
+
+        meeting_minutes = self._buffer.meeting_minutes()
+        counts = self._requests.approved_slot_counts_on_date(faculty_id, date)
+        approved = full_slots_from_counts(
+            academic_slots=academic_slots, approved_counts=counts,
+            meeting_minutes=meeting_minutes,
+        )
 
         # EVENT-CONFLICT EXCLUSION IS DEFERRED. The canonical `events` table
         # links only to clubs (events.organizing_club_id) — there is NO

@@ -28,7 +28,7 @@ from app.core.errors import IllegalTransition
 
 REQUEST_TRANSITIONS: dict[R, frozenset[R]] = {
     R.PENDING: frozenset({R.APPROVED, R.REJECTED, R.CANCELLED, R.RESCHEDULED}),
-    R.APPROVED: frozenset({R.RESCHEDULED, R.CANCELLED}),
+    R.APPROVED: frozenset({R.RESCHEDULED, R.CANCELLED, R.APPROVED}),
     R.RESCHEDULED: frozenset({R.APPROVED, R.REJECTED, R.CANCELLED}),
     R.REJECTED: frozenset(),
     R.CANCELLED: frozenset(),

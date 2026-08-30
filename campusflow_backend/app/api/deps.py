@@ -25,7 +25,6 @@ from app.services.free_slot_service import FreeSlotService
 from app.services.queue_service import QueueService
 from app.services.token_service import TokenService
 
-
 class AuthContext:
     """The authenticated caller."""
 
