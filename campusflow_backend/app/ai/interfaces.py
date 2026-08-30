@@ -1,18 +1,12 @@
 """
-AI boundary — INTERFACES ONLY.
+AI Service boundaries for the MVP.
 
-The brief asks for clean interfaces so an AI layer can be added later "without
-rewriting the scheduling system", and explicitly forbids AI-driven priority in
-this MVP. So:
+The original brief requested a clean interface boundary for the AI layer so that
+it can be fully decoupled from the scheduling engine. 
 
-  * These Protocols are pure function contracts. They accept plain data and
-    return plain data — no ORM, no session, no HTTP, no LLM client.
-  * The MVP ships deterministic implementations (app/ai/deterministic.py) that
-    reuse the same Free Slot Engine output. Swapping in an LLM-backed
-    implementation later means writing a new class that satisfies the same
-    Protocol; no scheduling code changes.
-  * Nothing here influences priority or approval decisions. The AI surface is
-    advisory (recommend, explain, summarise) by design.
+Per the Frozen Architecture PDF, the AI Priority Engine (System 1) MUST be consumed
+by the Meeting Engine to order the queue. The PriorityCalculator protocol establishes
+this explicit boundary for calculating ETAs and Queue Positions.
 """
 from __future__ import annotations
 
@@ -51,4 +45,12 @@ class ScheduleSummarizer(Protocol):
         self, *, date: _dt.date, teaching: Sequence[SlotView],
         appointments: Sequence[SlotView], free: Sequence[SlotView],
     ) -> str:
+        ...
+
+from typing import Any
+
+@runtime_checkable
+class PriorityCalculator(Protocol):
+    """System 1: Calculates appointment queue priority scores and reasoning."""
+    async def calculate_priority(self, appointment_details: dict, student_details: dict, faculty_details: dict, category: str, reason: str, requested_duration: int) -> Any:
         ...
