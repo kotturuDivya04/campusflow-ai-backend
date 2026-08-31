@@ -253,6 +253,18 @@ class RequestRepository:
         ).all()
         return {r[0] for r in rows}
 
+    def approved_slot_counts_on_date(self, faculty_id: int, date: _dt.date) -> dict[int, int]:
+        rows = self.db.execute(
+            select(QueueEntry.academic_slot_id, func.count(QueueEntry.id)).where(and_(
+                QueueEntry.faculty_id == faculty_id,
+                QueueEntry.meeting_date == date,
+                QueueEntry.state.in_([s.value for s in (
+                    QueueState.WAITING, QueueState.CHECKED_IN,
+                    QueueState.READY, QueueState.IN_PROGRESS, QueueState.COMPLETED)]),
+            )).group_by(QueueEntry.academic_slot_id)
+        ).all()
+        return {r[0]: r[1] for r in rows}
+
     def list_for_admin(
         self, *, status: str | None = None, faculty_id: int | None = None,
         student_id: int | None = None, date_from: _dt.date | None = None,

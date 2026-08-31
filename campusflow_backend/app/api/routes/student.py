@@ -71,7 +71,6 @@ def submit_appointment(payload: AppointmentCreate,
         date=payload.date, slot_id=payload.academic_slot_id,
         title=payload.title, description=payload.description,
         request_type=payload.request_type,
-        duration_minutes=payload.duration_minutes,
     )
     db.commit()
     return req
